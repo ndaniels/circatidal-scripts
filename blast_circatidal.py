@@ -17,8 +17,19 @@ import sys
 import re
 import csv
 
+if sys.argv[1] == '-h' or len(sys.argv) < 5:
+    print(f'Usage: {sys.argv[0]} fasta_file csv_file blast_type database [evalue]')
+    exit(0)
+
 fasta_file = sys.argv[1]
 csv_file = sys.argv[2]
+blast_type = sys.argv[3]
+database = sys.argv[4]
+evalue = 0.01
+
+if sys.argv[5] is not None:
+    evalue = float(sys.argv[5])
+
 
 sequences = {}
 #read fasta file
@@ -51,7 +62,7 @@ for seqid in seqs_to_blast.keys():
     # print(f'>{seqid}')
     # print(seqs_to_blast[seqid])
     # alternatively, we may want blastn, nt (or nt_euk)
-    result_stream = blast.qblast("blastn", "nt_euk", seqs_to_blast[seqid], format_type="Text")
+    result_stream = blast.qblast(blast_type, database, seqs_to_blast[seqid], expect=evalue, format_type="Text")
     # result_stream = blast.qblast("blastx", "swissprot", seqs_to_blast[seqid], format_type="Text")
     result = result_stream.read()
     with open(f'{seqid}_out.txt', 'w') as save_file:
